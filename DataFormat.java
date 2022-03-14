@@ -13,11 +13,12 @@ public class DataFormat {
         }
     }
 
-    public static void csv() {
+    public static void csv(String path) {
         try {
-            FileReader fr = new FileReader("src/data.txt");
+            FileReader fr = new FileReader(path);
             BufferedReader br = new BufferedReader(fr);
-            FileWriter fw = new FileWriter("src/data.csv");
+            String dest = path.substring(0, path.lastIndexOf("\\"));
+            FileWriter fw = new FileWriter(dest + "\\data.csv");
             BufferedWriter bw = new BufferedWriter(fw);
 
             String line;
@@ -39,31 +40,14 @@ public class DataFormat {
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        try {
-//            FileWriter fw = new FileWriter("src/data.csv");
-//
-//            Scanner sc = new Scanner(new File("src/data.txt"));
-//            Scanner sc = new Scanner(new File("src/test.txt"));
-//
-//            sc.useDelimiter("\\t");
-//
-//            while (sc.hasNext()) {
-//                fw.write(sc.next() + ",");
-//            }
-//
-//            sc.close();
-//            fw.close();
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
     }
 
-    public static void json() {
+    public static void json(String path) {
         try {
-            FileReader fr = new FileReader("src/data.txt");
+            FileReader fr = new FileReader(path);
             BufferedReader br = new BufferedReader(fr);
-            FileWriter fw = new FileWriter("src/data.json");
+            String dest = path.substring(0, path.lastIndexOf("\\"));
+            FileWriter fw = new FileWriter(dest + "\\data.json");
             BufferedWriter bw = new BufferedWriter(fw);
 
             String[] properties = br.readLine().split("\\t"); //store top row
@@ -120,17 +104,67 @@ public class DataFormat {
         }
     }
 
+    public static void xml(String path) {
+        try {
+            FileReader fr = new FileReader(path);
+            BufferedReader br = new BufferedReader(fr);
+            String dest = path.substring(0, path.lastIndexOf("\\"));
+            FileWriter fw = new FileWriter(dest + "\\data.xml");
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            String[] properties = br.readLine().split("\\t"); //store top row
+            String tab = "    ";
+            String row;
+
+            //begin structuring
+            add(bw, "<data>", 0);
+
+            while ((row = br.readLine()) != null) {
+                add(bw, "<entry>", 1);
+                String[] vals = row.split("\\t");
+                for (int i = 0; i < vals.length; i++) {
+                    String rmSpace = properties[i].replace(" ", "");
+                    properties[i] = rmSpace;
+                    add(bw, "<" + properties[i] + ">" + vals[i] + "</" + properties[i] + ">", 2);
+                }
+                add(bw, "</entry>", 1);
+
+            }
+
+            add(bw, "</data>", 0);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
+        while (true) {
+            Scanner in = new Scanner(System.in); //scanner for user input
 
-        Scanner in = new Scanner(System.in); //scanner for user input
+            System.out.println("Convert file into CSV 'c', JSON 'j', XML 'x': "); //ask user
+            String format = in.nextLine(); //users preferred format
+            System.out.println("Path to the data file to be converted:"); //ask user
+            String path = in.nextLine();
 
-        System.out.println("Convert file into CSV 'c', JSON 'j', XML 'x': "); //ask user
-        String format = in.nextLine(); //users preferred format
+            if (format.equals("c")) csv(path);
+            else if (format.equals("j")) json(path);
+            else if (format.equals("x")) xml(path);
+            else {
+                System.out.println("Invalid format input");
+                continue;
+            }
 
-        if (format.equals("c")) csv();
-        if (format.equals("j")) json();
-
+            System.out.println("If no error, file converted to " + format);
+            System.out.println("Do you want to perform another conversion? (y/n)");
+            String c = in.nextLine();
+            if (c.equals("n")) break;
+            else if (c.equals("y")) continue;
+            else {
+                System.out.println("Invalid input, ending session");
+                break;
+            }
+        }
     }
 
 }
