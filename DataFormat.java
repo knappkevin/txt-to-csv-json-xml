@@ -123,8 +123,14 @@ public class DataFormat {
                 add(bw, "<entry>", 1);
                 String[] vals = row.split("\\t");
                 for (int i = 0; i < vals.length; i++) {
-                    String rmSpace = properties[i].replace(" ", "");
-                    properties[i] = rmSpace;
+                    String reval = vals[i].replace("&", "and");
+                    vals[i] = reval;
+                    String reconfig = properties[i].replace(" ", "");
+                    reconfig = reconfig.replace("/", "per");
+                    reconfig = reconfig.replace("(", "-");
+                    reconfig = reconfig.replace(")", "-");
+                    if (Character.isDigit(reconfig.charAt(0))) reconfig = "_" + reconfig;
+                    properties[i] = reconfig;
                     add(bw, "<" + properties[i] + ">" + vals[i] + "</" + properties[i] + ">", 2);
                 }
                 add(bw, "</entry>", 1);
